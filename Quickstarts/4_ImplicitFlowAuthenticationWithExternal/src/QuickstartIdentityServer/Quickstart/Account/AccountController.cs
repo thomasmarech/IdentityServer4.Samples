@@ -172,7 +172,8 @@ namespace IdentityServer4.Quickstart.UI
 
                     var id = new ClaimsIdentity(provider);
                     id.AddClaim(new Claim(ClaimTypes.NameIdentifier, HttpContext.User.Identity.Name));
-                    id.AddClaim(new Claim(ClaimTypes.Name, HttpContext.User.Identity.Name));
+                    //id.AddClaim(new Claim(ClaimTypes.Name, HttpContext.User.Identity.Name));
+                    id.AddClaims(HttpContext.User.Claims);
 
                     await HttpContext.Authentication.SignInAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme, new ClaimsPrincipal(id), props);
                     return Redirect(returnUrl);
@@ -242,11 +243,11 @@ namespace IdentityServer4.Quickstart.UI
             var additionalClaims = new List<Claim>();
 
             // if the external system sent a session id claim, copy it over
-            var sid = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.SessionId);
-            if (sid != null)
-            {
-                additionalClaims.Add(new Claim(JwtClaimTypes.SessionId, sid.Value));
-            }
+            //var sid = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.SessionId);
+            //if (sid != null)
+            //{
+            //    additionalClaims.Add(new Claim(JwtClaimTypes.SessionId, sid.Value));
+            //}
 
             // if the external provider issued an id_token, we'll keep it for signout
             AuthenticationProperties props = null;
@@ -258,7 +259,7 @@ namespace IdentityServer4.Quickstart.UI
             }
 
             // issue authentication cookie for user
-            await HttpContext.Authentication.SignInAsync(user.SubjectId, user.Username, provider, props, additionalClaims.ToArray());
+            await HttpContext.Authentication.SignInAsync(user.SubjectId, user.Username, provider, props, claims.ToArray());
 
             // delete temporary cookie used during external authentication
             await HttpContext.Authentication.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);

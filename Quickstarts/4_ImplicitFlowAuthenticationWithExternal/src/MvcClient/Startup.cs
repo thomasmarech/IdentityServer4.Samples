@@ -48,7 +48,8 @@ namespace MvcClient
                 AuthenticationScheme = "Cookies"
             });
 
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
+
+            var openIdOpts = new OpenIdConnectOptions
             {
                 AuthenticationScheme = "oidc",
                 SignInScheme = "Cookies",
@@ -58,7 +59,9 @@ namespace MvcClient
 
                 ClientId = "mvc",
                 SaveTokens = true
-            });
+            };
+            openIdOpts.Scope.Add("customscope");
+            app.UseOpenIdConnectAuthentication(openIdOpts);
             
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();

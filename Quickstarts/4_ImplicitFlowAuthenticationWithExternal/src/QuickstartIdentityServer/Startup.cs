@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Server;
+using System.IO;
 
 namespace QuickstartIdentityServer
 {
@@ -18,7 +20,16 @@ namespace QuickstartIdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowSpecificOrigin",
+            //        builder => builder.WithOrigins("http://example.com").AllowAnyHeader());
+            //});
+
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new UrlReferrerFilter()); // an instance
+            });
 
             // configure identity server with in-memory stores, keys, clients and scopes
             services.AddIdentityServer()
@@ -26,11 +37,13 @@ namespace QuickstartIdentityServer
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
-                .AddTestUsers(Config.GetUsers());
+                .AddTestUsers(Config.GetUsers())
+                .AddProfileService<CustomProfileService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            //app.UseCors("AllowSpecificOrigin");
             app.UseDeveloperExceptionPage();
 
             app.UseIdentityServer();

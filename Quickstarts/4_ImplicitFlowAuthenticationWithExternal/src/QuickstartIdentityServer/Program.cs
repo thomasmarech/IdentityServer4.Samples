@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Net.Http.Server;
 
 namespace QuickstartIdentityServer
 {

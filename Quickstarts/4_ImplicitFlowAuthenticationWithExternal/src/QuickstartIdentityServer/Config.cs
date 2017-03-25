@@ -11,6 +11,23 @@ namespace QuickstartIdentityServer
 {
     public class Config
     {
+        public class MyIdentityResource : IdentityResource
+        {
+            public MyIdentityResource()
+            {
+                Name = "customscope";
+                DisplayName = "Custom identity resource";
+                Emphasize = true;
+                UserClaims.Add("toto");
+                UserClaims.Add(ClaimTypes.Role);
+                UserClaims.Add(ClaimTypes.Name);
+                UserClaims.Add(ClaimTypes.NameIdentifier);
+                UserClaims.Add(ClaimTypes.WindowsAccountName);
+                UserClaims.Add(ClaimTypes.GroupSid);
+                UserClaims.Add(ClaimTypes.Email);
+            }
+        }
+
         // scopes define the resources in your system
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
@@ -18,6 +35,7 @@ namespace QuickstartIdentityServer
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
+                new MyIdentityResource()
             };
         }
 
@@ -65,15 +83,21 @@ namespace QuickstartIdentityServer
                 {
                     ClientId = "mvc",
                     ClientName = "MVC Client",
+                    ClientUri = "http://identityserver.io",
                     AllowedGrantTypes = GrantTypes.Implicit,
+                    RequireClientSecret = true,
+
+                    ClientSecrets = { new Secret("secretcusto".Sha256()) },
 
                     RedirectUris = { "http://localhost:5002/signin-oidc" },
                     PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc" },
+                    AllowedCorsOrigins =     { "http://localhost:7017" },
 
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "customscope"
                     }
                 }
             };
@@ -92,7 +116,8 @@ namespace QuickstartIdentityServer
                     Claims = new List<Claim>
                     {
                         new Claim("name", "Alice"),
-                        new Claim("website", "https://alice.com")
+                        new Claim("website", "https://alice.be"),
+                        new Claim("toto", "hello!")
                     }
                 },
                 new TestUser
@@ -105,6 +130,20 @@ namespace QuickstartIdentityServer
                     {
                         new Claim("name", "Bob"),
                         new Claim("website", "https://bob.com")
+                    }
+                },
+                new TestUser
+                {
+                    SubjectId = "3",
+                    ProviderSubjectId = "TMA-W8\\Thomas",                    
+                    Username = "TMA-W8\\Thomas",
+                    ProviderName = "Windows",
+
+                    Claims = new List<Claim>
+                    {
+                        new Claim("name", "Thomas"),
+                        new Claim("website", "http://tmadev.be"),
+                        new Claim("toto", "Coucou mec!")
                     }
                 }
             };
